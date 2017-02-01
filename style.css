@@ -1,0 +1,124 @@
+/* Styles go here */
+
+.group {
+    min-height:200px;
+    margin:10px;
+    border-style:solid;
+    padding:5px;
+    border-radius:10px;
+    background-color:rgb(245,245,245);
+}
+.group-container{
+    min-height:200px;
+    background-color:rgb(245,245,245);
+    border-style:solid;
+    padding:5px;
+    border-radius:10px;
+    width:100%;
+}
+
+.selected {
+    background: #e5e5e5;
+}
+
+button{
+    transition: all 0.3s ease 0s;
+}
+
+
+.operator{
+    height: 28px;
+    width:85px;
+}
+.row
+{
+    margin:5px 0px 5px 0px;
+}
+
+.right{
+    height:28px;
+    -webkit-border-radius:4px ;
+    padding-left:2px;
+    padding-right: 2px;
+    max-width:200px;
+}
+
+.select2-selection:hover{
+    background-color: #cbd1db;
+}
+
+
+
+.andorSelect{
+    width:60px;
+}
+
+.list-group-item{
+    width:90px;
+}
+
+.removeRow{
+    padding:5px;
+    border-bottom:1px solid rgba(0, 0, 0, 0.14);
+    border-top-right-radius: 3px;
+    border-top-left-radius: 3px;
+    margin-top: 0px;
+}
+
+.autocom{
+    width: 200px;
+}
+
+.fieldOnly{
+    padding-left:40px !important;
+    display: block;
+    border-radius:0px;
+    text-align: left;
+    margin-top: 5px;
+}
+
+#fields{
+    max-height: 600px;
+    overflow-y:scroll
+}
+
+.value-container{
+    display: inline-block;
+    margin: 0 5px 0 0;
+    vertical-align: middle;
+    border-left: 1px solid #aaa;
+    padding-left: 5px;
+    margin-left:10px;
+}
+
+.operator-container{
+    display: inline-block;
+    margin: 0 10px 0 0;
+    vertical-align: middle;
+}
+
+.field-container{
+    display: inline-block;
+    vertical-align: middle;
+    margin: 5px 5px 0 0;
+}
+
+.condition-container{
+    border-radius: 5px;
+    padding: 5px;
+    border: 1px solid #EEE;
+    background: rgb(245,245,245);
+}
+
+.field-group-heading{
+    display: block;
+    text-align: left;
+}
+
+.select2-container{
+    min-width:65px;
+}
+
+.select2-results__option[aria-selected=true] {
+    display: none;
+}
