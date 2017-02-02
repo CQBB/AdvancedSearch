@@ -15,10 +15,13 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css" rel="stylesheet" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js"></script>
 
+
     <script src="underscore-min.js"></script>
 
     <link rel="stylesheet" href="style.css" />
     <script src="script.js"></script>
+
+
 
 </head>
 <body>
@@ -28,6 +31,11 @@
         <div class="col-lg-4">
             <b>Fields</b>
             <div><div id="fields" class='panel-group'></div></div>
+            <br>
+            <b>Saved Search</b>
+            <table class="table table-hover" id="savedSearches"></table>
+
+
 
         </div>
         <div class="col-lg-6">
@@ -39,11 +47,32 @@
             <button id="addGroup" class="btn btn-primary" style="margin-bottom: 5px">Add Group</button>
             <button id="getJson" class="btn btn-primary" style="margin-bottom: 5px">Generate Transport Data</button>
             <button id="removeAll" class="btn btn-primary" style="margin-bottom: 5px">Remove All</button>
-
+            <button id="saveSearch" class="btn btn-primary" style="margin-bottom: 5px">Save Search</button>
             <div id='query'></div>
         </div>
 
     </div>
+
+    <div class="modal fade" tabindex="-1" role="dialog" id="saveModal">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">Add/Edit search name</h4>
+                </div>
+                <div class="modal-body">
+                   <div class="row">
+                       <div class="col-sm-4"><span>Search name:</span></div>
+                       <div class="col-sm-6"><input class="form-control" width="200px" id="searchName"></div>
+                   </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="saveSearchModal">Save</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
 </div>
 
 </body>

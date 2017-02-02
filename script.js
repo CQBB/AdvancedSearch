@@ -347,6 +347,100 @@ $(document).ready(function() {
         e.stopPropagation();
     });
 
+
+    //Save search click
+    $('#saveSearch').click(function (e) {
+        e.preventDefault();
+        $('#saveModal').modal('show');
+
+    });
+
+
+
+    $('#saveSearchModal').click(function (){
+       var search={};
+        search.searchData=generateTransportData($('#container'));
+        search.searchContent=$('#container').html();
+      var searches={};
+
+       if(localStorage.getItem('maxId')==null)
+       {
+           localStorage.setItem('maxId',0);
+       }
+
+       if(JSON.parse(localStorage.getItem('searches'))==null)
+       {
+         searches={
+            "searches":[]
+        };
+
+         localStorage.setItem('searches',JSON.stringify(searches));
+       }
+
+       searches=JSON.parse(localStorage.getItem('searches'));
+       var maxId=localStorage.getItem('maxId');
+       search.id=++maxId;
+       localStorage.setItem('maxId',maxId);
+       search.name=$('#searchName').val();
+       if(search.name.length=='')
+       {
+           search.name='Search name unspecified';
+       }
+       searches.searches.push(search);
+       localStorage.setItem('searches',JSON.stringify(searches));
+
+       var savedSearchContainer=$("<tr class='row'>" +
+           "<td class='col-xs-8 search-name'>"+search.name+"</td>" +
+           "<td class='col-xs-2 btn btn-default btn-sm edit-search'><span class='glyphicon glyphicon-edit'></span></td>" +
+           "<td class='col-xs-2 btn btn-default btn-sm remove-search'><span class='glyphicon glyphicon-remove'></span></td>" +
+           "</tr>");
+
+       savedSearchContainer.data('search',search);
+       $('#savedSearches').append(savedSearchContainer);
+
+       $('#saveModal').modal('hide');
+    });
+
+    $('#saveModal').on('hidden.bs.modal',function (e) {
+       $(this).find('input').val('').end();
+    });
+
+    $('#savedSearches').on('click','.remove-search',function (e) {
+
+          var search=$(this).parent().data('search');
+
+          var searches=JSON.parse(localStorage.getItem('searches'));
+          searches.searches=_.without(searches.searches,_.findWhere(searches.searches,{id:search.id}));
+          localStorage.setItem('searches',JSON.stringify(searches));
+          $(this).parent().remove();
+    });
+
+    $('#savedSearches').on('click','.edit-search',function (e) {
+         var search=$(this).parent().data('search');
+         $('#container').html(search.searchContent);
+         $('.andorSelect').select2();
+
+    });
+
+    loadSavedSearches();
+    //Load the saved searches from localstorage
+    function  loadSavedSearches() {
+        var searches=JSON.parse(localStorage.getItem('searches'));
+        if(searches!=null)
+        {
+            $.each(searches.searches,function (i,s) {
+                var savedSearchContainer=$("<tr class='row'>" +
+                    "<td class='col-xs-8 search-name'>"+s.name+"</td>" +
+                    "<td class='col-xs-2 btn btn-default btn-sm edit-search'><span class='glyphicon glyphicon-edit'></span></td>" +
+                    "<td class='col-xs-2 btn btn-default btn-sm remove-search'><span class='glyphicon glyphicon-remove'></span></td>" +
+                    "</tr>");
+
+                savedSearchContainer.data('search',s);
+                $('#savedSearches').append(savedSearchContainer);
+            })
+        }
+    };
+    
     //Populate the fields
     function populateFields() {
         $.getJSON("fieldsDefinition.json",function (data) {
@@ -354,7 +448,7 @@ $(document).ready(function() {
             var i=0;
            $.each(groups,function (i,group) {
                var id='collapse'+(++i);
-               var groupPenel=$("<div class='panel panel-default'><div class='panel-heading btn btn-default field-group-heading' data-toggle='collapse'" +
+               var groupPenel=$("<div class='panel panel-default field-group-container'><div class='panel-heading btn btn-default field-group-heading' data-toggle='collapse'" +
                    " data-parent='#fields' href='#"+id+"'>"+group.Group+"</div></div>");
 
             var btnTable=$("<table class='table table-hover panel-collapse collapse' id='"+id+"'><tbody></tbody></table>");
@@ -417,7 +511,7 @@ $(document).ready(function() {
 
         }else if(selectType== "Textbox"||selectType=="Range")
         {
-            rightOperand = $("<input style='width:50px;' class='right form-control'></input>");
+            rightOperand = $("<input style='width:100px;' class='right form-control'></input>");
         }
         valueContainer.append(rightOperand);
         return valueContainer;

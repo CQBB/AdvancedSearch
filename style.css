@@ -97,6 +97,10 @@ button{
     vertical-align: middle;
 }
 
+.field-group-container{
+    margin-top:0px !important;
+}
+
 .field-container{
     display: inline-block;
     vertical-align: middle;
@@ -113,6 +117,11 @@ button{
 .field-group-heading{
     display: block;
     text-align: left;
+
+}
+
+.field-group-heading:hover{
+    background-color:#e5e5e5;
 }
 
 .select2-container{
@@ -121,4 +130,23 @@ button{
 
 .select2-results__option[aria-selected=true] {
     display: none;
+}
+
+.modal {
+    text-align: center;
+}
+
+@media screen and (min-width: 768px) {
+    .modal:before {
+        display: inline-block;
+        vertical-align: middle;
+        content: " ";
+        height: 100%;
+    }
+}
+
+.modal-dialog {
+    display: inline-block;
+    text-align: left;
+    vertical-align: middle;
 }
