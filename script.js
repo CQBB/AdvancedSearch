@@ -22,7 +22,7 @@ $(document).ready(function() {
 
     ];
 
-
+    var fieldData=[];
     var models={};
     var makes={};
     var removeBtn = " <button type='button' class='btn btn-danger btn-xs remove pull-right'> <span class='glyphicon glyphicon-remove'></span></button>";
@@ -115,28 +115,43 @@ $(document).ready(function() {
     $('#getJson').click(function () {
       var data= generateTransportData($('#container'));
 
+
        console.log(data);
         console.log(getSqlQueryFromJson(data));
       console.log(JSON.stringify(data));
 
     });
 
+    $('#fields').on('click','.field-group-heading',function () {
+        $('.field-group-heading-selected').removeClass('field-group-heading-selected');
+        $(this).addClass('field-group-heading-selected');
+
+    });
+
     $('#addGroup').click(function() {
-        var groupBox = $("<div class='group condition panel panel-default row' tabindex='-1'></div>");
-        var removeRow=$("<div class='row removeRow'></div>");
-        var removeBtn=$("<button type='button' class='btn btn-danger pull-right remove btn-xs'><span class='glyphicon glyphicon-remove'></span>Remove Group</button>");
-        $('.selected').append(groupBox);
-        addAndOrOptions(groupBox);
-        removeRow.append(removeBtn);
-        groupBox.append(removeRow);
-        $('.selected').removeClass('selected');
-        groupBox.addClass("selected");
+        var selectedGroup=$('.selected');
+        var newGroup=addBlankGroup(selectedGroup);
+        addAndOrOptions(newGroup);
         $('.andorSelect').select2({
             minimumResultsForSearch: -1
         });
-
         updateQuery();
     });
+
+    function addBlankGroup(selectedGroup) {
+        var groupBox = $("<div class='group condition panel panel-default row' tabindex='-1'></div>");
+        var removeRow=$("<div class='row removeRow'></div>");
+        var removeBtn=$("<button type='button' class='btn btn-danger pull-right remove btn-xs'><span class='glyphicon glyphicon-remove'></span>Remove Group</button>");
+        selectedGroup.append(groupBox);
+
+        removeRow.append(removeBtn);
+        groupBox.append(removeRow);
+        selectedGroup.removeClass('selected');
+        groupBox.addClass("selected");
+
+
+        return groupBox;
+    };
 
     $('#getConditionString').click(function() {
 
@@ -303,13 +318,20 @@ $(document).ready(function() {
     //Field add click
     $('#fields').on('click','.btn-add',function(e) {
         var field=$(this).parent().parent().data('field');
-
         var condition = getCondition(field);
         $('.selected').append(condition);
         addAndOrOptions(condition);
 
         //Bueatify select
+       setHtmlBehavior(field,condition);
 
+
+
+        updateQuery();
+        e.stopPropagation();
+    });
+
+    function setHtmlBehavior(field,condition) {
         $('.andorSelect').select2({
             minimumResultsForSearch: -1
         });
@@ -340,12 +362,7 @@ $(document).ready(function() {
                 this.value = this.value.replace(/[^0-9\.]/g,'');
             });
 
-        //Filter model DDL
-
-
-        updateQuery();
-        e.stopPropagation();
-    });
+    }
 
 
     //Save search click
@@ -360,7 +377,7 @@ $(document).ready(function() {
     $('#saveSearchModal').click(function (){
        var search={};
         search.searchData=generateTransportData($('#container'));
-        search.searchContent=$('#container').html();
+       // search.searchContent=$('#container').html();
       var searches={};
 
        if(localStorage.getItem('maxId')==null)
@@ -386,6 +403,16 @@ $(document).ready(function() {
        {
            search.name='Search name unspecified';
        }
+
+       //Tell if the search exists
+       /* var exSearch=_.findWhere(searches,{id:search.id});
+        if(exSearch!=null)
+        {
+            _.extend(_.findWhere(searches,{id:search.id}),search);
+        }
+*/
+
+
        searches.searches.push(search);
        localStorage.setItem('searches',JSON.stringify(searches));
 
@@ -417,8 +444,9 @@ $(document).ready(function() {
 
     $('#savedSearches').on('click','.edit-search',function (e) {
          var search=$(this).parent().data('search');
-         $('#container').html(search.searchContent);
-         $('.andorSelect').select2();
+         $('#container').empty();
+         loadSavedGroup($('#container'),search.searchData.conditions);
+
 
     });
 
@@ -439,12 +467,68 @@ $(document).ready(function() {
                 $('#savedSearches').append(savedSearchContainer);
             })
         }
-    };
+    }
+
+
+
+
+
+    function loadSavedGroup(currGroup,conditions) {
+        $.each(conditions,function (i,condition) {
+            var type=condition.type;
+            if(type=='condition')
+            {
+
+                var variable=condition.variable;
+                //find the field to fill the condition
+                var field=_.find(fieldData,function (f) {
+                    return f.Variable==variable;
+                });
+                var conditionHtml=getCondition(field);
+
+                //Pre fill selected
+                if(condition.relation=='IN'){
+                    var multiString=condition.value.slice(1,-1);
+                    conditionHtml.find('.right').val(multiString.split(','));
+
+                }
+                else if(condition.relation=='NOT IN'){
+                    var multiString=condition.value.slice(1,-1);
+                    conditionHtml.find('.right').val(multiString.split(','));
+               }else
+                {
+                    conditionHtml.find('.right').val(condition.value);
+                }
+
+                conditionHtml.find('.operator').val(condition.relation);
+                currGroup.append(conditionHtml);
+                setHtmlBehavior(field,conditionHtml);
+
+
+            }
+            else if(type=='operator')
+            {
+                var andOrOptions = $("<div class='andor row'><select class=andorSelect><option class=and>AND</option><option class=or>OR</option><select></div>");
+                andOrOptions.find('select').val(condition.value);
+                currGroup.append(andOrOptions);
+                $('.andorSelect').select2({
+                    minimumResultsForSearch: -1
+                });
+            }
+            else if(type=='group'){
+                var newGroup=addBlankGroup(currGroup);
+                var conditionsInGroup=condition.conditions;
+                loadSavedGroup(newGroup,conditionsInGroup.conditions);
+            }
+        });
+
+    }
     
     //Populate the fields
     function populateFields() {
         $.getJSON("fieldsDefinition.json",function (data) {
             var groups=data.Groups;
+
             var i=0;
            $.each(groups,function (i,group) {
                var id='collapse'+(++i);
@@ -455,10 +539,11 @@ $(document).ready(function() {
 
 
             $.each(group.Fields,function (i,field) {
-                var fieldTd=$("<td class='row'><div  data-value='"+field.DBField+"' data-OperatorType='"+field.OperatorType+"' " +
+                var fieldTd=$("<td class='row'><div  value='"+field.id+"' data-OperatorType='"+field.OperatorType+"' " +
                     "class='field fieldOnly col-sm-10'>"+field.Variable+"</div><div class='col-sm-2'>" +
                     "<button class='btn btn-default btn-add btn-sm' type='button'><span class='glyphicon glyphicon-plus'></span></button></div></td>");
                 var fieldTr=$("<tr></tr>");
+                fieldData.push(field);
                 fieldTr.append(fieldTd);
                 fieldTd.data("field",field);
                 btnTable.append(fieldTr);
@@ -478,7 +563,7 @@ $(document).ready(function() {
     function getCondition(field) {
         var operator;
         var rightOperand;
-        var condition = $("<div class='condition row condition-container'><div class='field col-sm-3 field-container' data-value='" + field.DBField + "'>" + field.Variable + "</div></div>");
+        var condition = $("<div class='condition row condition-container'><div class='field col-sm-3 field-container' value='" + field.id + "'>" + field.Variable + "</div></div>");
 
 
         //operator dropdown
@@ -500,10 +585,10 @@ $(document).ready(function() {
         var rightOperand;
         var selectType=field.SelectType;
         var valueContainer= $("<div class='col-sm-5 value-container'></div>");
-        if (field.DBField == 'CISS.VEH.MAKE') {
+        if (field.id == '21') {
             rightOperand = getVDDL(makes, 'make');
 
-        } else if (field.DBField == 'CISS.VEH.MODEL') {
+        } else if (field.id == '22') {
             var groupedModels=getGroupedModelsFromCurrMakes();
             rightOperand = getVDDL(groupedModels, 'model');
         } else if(selectType=='MultiSelect'||selectType=='Dropdown'){
@@ -548,7 +633,7 @@ $(document).ready(function() {
                 var optgroup=$("<optgroup label='"+i+"'></optgroup>");
                 var options=[];
                 $.each(item,function (i,subitem) {
-                    options.push("<option class=" + className + " data-value="+subitem.Id+">" + subitem.Name + "</option>");
+                    options.push("<option class=" + className + " value="+subitem.Id+">" + subitem.Name + "</option>");
                 });
                 optgroup.append(options.join(''));
                 DDL.append(optgroup);
@@ -559,7 +644,7 @@ $(document).ready(function() {
             DDL.addClass('makeSelect');
             var options = [];
             $.each(items, function(i, item) {
-                options.push("<option class=" + className + " data-value="+item.Id+">" + item.Name + "</option>");
+                options.push("<option class=" + className + " value="+item.Id+">" + item.Name + "</option>");
             });
 
             DDL.append(options.join(''));
@@ -579,7 +664,7 @@ $(document).ready(function() {
 
         var options=[];
         $.each(field.Values,function (i,v) {
-            options.push("<option  data-value="+v.Value+">" + v.ValueText + "</option>");
+            options.push("<option  value="+v.Value+">" + v.ValueText + "</option>");
         });
         DDL.append(options.join(''));
 
@@ -601,7 +686,7 @@ $(document).ready(function() {
 
     //get the condition string from condition div
     function getSingleConditionString(condition) {
-        var fieldTxt = condition.find('.field').attr('data-value');
+        var fieldTxt = condition.find('.field').attr('value');
         var operatorTxt = "";
         var operator = condition.find('.operator');
         var right = condition.find('.right');
@@ -633,7 +718,7 @@ $(document).ready(function() {
             {
                 var rigthtTxtArray=[];
                 $.each(selected,function (i,s) {
-                    rigthtTxtArray.push($(s).attr('data-value'));
+                    rigthtTxtArray.push($(s).attr('value'));
                 });
                 rightTxt='('+rigthtTxtArray.join(',')+')';
                 if(operatorTxt=='=')
@@ -647,7 +732,7 @@ $(document).ready(function() {
             }
             else
             {
-                rightTxt = right.find('option:selected').attr('data-value');
+                rightTxt = right.find('option:selected').attr('value');
             }
 
 
@@ -659,7 +744,7 @@ $(document).ready(function() {
 
     //Form the json object for single condition
     function getSingleConditionData(condition) {
-        var fieldTxt = condition.find('.field').attr('data-value');
+        var fieldTxt = condition.find('.field').attr('value');
         var operatorTxt = "";
         var operator = condition.find('.operator');
         var right = condition.find('.right');
@@ -674,26 +759,35 @@ $(document).ready(function() {
         {
             var rigthtTxtArray=[];
             $.each(selected,function (i,s) {
-                rigthtTxtArray.push($(s).attr('data-value'));
+                rigthtTxtArray.push($(s).attr('value'));
             });
             rightTxt='('+rigthtTxtArray.join(',')+')';
-            operatorTxt='in';
+            if(operatorTxt=='=')
+            {
+                operatorTxt='IN';
+            }
+            else
+            {
+                operatorTxt='NOT IN';
+            }
+
         }
         else
         {
-            rightTxt = right.find('option:selected').attr('data-value');
+            rightTxt = right.find('option:selected').attr('value');
         }
 
 
         data.type='condition';
-        data.dbField=fieldTxt;
+        data.id=fieldTxt;
         data.relation=operatorTxt;
         data.value=rightTxt;
+        data.variable=condition.find('.field').text();
         return data;
     }
 
      function getSingleConditionJson(condition ) {
-         return condition.dbField+' '+condition.relation+' '+condition.value;
+         return condition.id+' '+condition.relation+' '+condition.value;
      }
 
 });

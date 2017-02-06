@@ -5,15 +5,20 @@
     margin:10px;
     border-style:solid;
     padding:5px;
-    border-radius:10px;
+
     background-color:rgb(245,245,245);
 }
+
+td{
+    border-top-width: 0px !important;
+}
+
 .group-container{
     min-height:200px;
     background-color:rgb(245,245,245);
     border-style:solid;
     padding:5px;
-    border-radius:10px;
+
     width:100%;
 }
 
@@ -98,7 +103,9 @@ button{
 }
 
 .field-group-container{
-    margin-top:0px !important;
+    margin-top:5px !important;
+    margin-bottom:5px !important;
+    border-radius: 0px !important;
 }
 
 .field-container{
@@ -117,12 +124,22 @@ button{
 .field-group-heading{
     display: block;
     text-align: left;
-
+    border-radius: 0px;
+    border-top-width: 0px;
 }
 
 .field-group-heading:hover{
     background-color:#e5e5e5;
 }
+
+.field-group-heading-selected{
+   background-color:  #c7c7c7 !important;
+   border-left:   8px solid #7c7b7b !important;
+    -webkit-box-shadow: 1px 10px 16px -5px rgba(97,97,97,1);
+    -moz-box-shadow: 1px 10px 16px -5px rgba(97,97,97,1);
+    box-shadow: 1px 7px 10px -2px rgba(97,97,97,1);
+}
+
 
 .select2-container{
     min-width:65px;

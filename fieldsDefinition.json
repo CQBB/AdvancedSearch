@@ -1,8 +1,9 @@
 {"Groups":[
   {
     "Group": "Crash",
+    "id":"1",
     "Fields":
-    [{"Variable":"SCI Case Type","SelectType":"MultiSelect","DBField":"SCI.Case_Type.TypeID","OperatorType":"L",
+    [{"Variable":"SCI Case Type","SelectType":"MultiSelect","DBField":"SCI.Case_Type.TypeID","OperatorType":"L", "id":"11",
     "Values":[{"Value":4,"ValueText":"Adaptive Vehicle"},
       {"Value":5,"ValueText":"Advanced Air Bag - NHTSA"},
       {"Value":6,"ValueText":"Advanced Occupant Protection System - AOPS"},
@@ -43,11 +44,11 @@
       {"Value":41,"ValueText":"Unknown"}]},
 
 
-      {"Variable":"Year","SelectType":"Dropdown","DBField":"CISS.CRASH.CASEYEAR","OperatorType":"L",
+      {"Variable":"Year","SelectType":"Dropdown","DBField":"CISS.CRASH.CASEYEAR","OperatorType":"L","id":"12",
       "Values":[{"Value":"2016","ValueText":"2016"},
         {"Value":"2015","ValueText":"2015"}]},
 
-      {"Variable":"Month","SelectType":"Dropdown","DBField":"month(CISS.CRASH.crashdate)","OperatorType":"L",
+      {"Variable":"Month","SelectType":"Dropdown","DBField":"month(CISS.CRASH.crashdate)","OperatorType":"L","id":"13",
       "Values":[{"Value":"Jan","ValueText":"Jan"},
         {"Value":"Feb","ValueText":"Feb"},
         {"Value":"Mar","ValueText":"Mar"},
@@ -61,7 +62,7 @@
         {"Value":"Nov","ValueText":"Nov"},
         {"Value":"Dec","ValueText":"Dec"}]},
 
-      {"Variable":"State","SelectType":"Dropdown","DBField":"SCI.Case_State.State","OperatorType":"L",
+      {"Variable":"State","SelectType":"Dropdown","DBField":"SCI.Case_State.State","OperatorType":"L","id":"14",
       "Values":[
         {
           "ValueText": "Alabama",
@@ -301,7 +302,7 @@
         }
       ]},
       
-      {"Variable":"In-Transport Vehicles","SelectType":"Range","DBField":"count(CISS.VEH.VEHID) where Transport=In-Transport","OperatorType":"N",
+      {"Variable":"In-Transport Vehicles","SelectType":"Range","DBField":"count(CISS.VEH.VEHID) where Transport=In-Transport","OperatorType":"N","id":"15",
       "Values":[{"Value":1,"ValueText":1},
         {"Value":2,"ValueText":2},
         {"Value":3,"ValueText":3},
@@ -314,7 +315,7 @@
         {"Value":10,"ValueText":10},
         {"Value":11,"ValueText":11}]},
 
-      {"Variable":"Mortality/Injury Severity","SelectType":"Dropdown","DBField":"N/A","OperatorType":"L",
+      {"Variable":"Mortality/Injury Severity","SelectType":"Dropdown","DBField":"N/A","OperatorType":"L","id":"16",
       "Values":[{"Value":1,"ValueText":"Fatalities"},
         {"Value":2,"ValueText":"Serious Injuries"},
         {"Value":3,"ValueText":"Minor/Moderate Injuries"},
@@ -322,9 +323,10 @@
   },
   {
     "Group":"Vehicle",
-    "Fields":[{"Variable":"Make","SelectType":"MultiSelect","DBField":"CISS.VEH.MAKE","OperatorType":"L"},
-      {"Variable":"Model","SelectType":"MultiSelect","DBField":"CISS.VEH.MODEL","OperatorType":"L"},
-      {"Variable":"Body Category","SelectType":"Dropdown","DBField":"CISS.VEH.BODYCAT","OperatorType":"L",
+    "id":"2",
+    "Fields":[{"Variable":"Make","SelectType":"MultiSelect","DBField":"CISS.VEH.MAKE","OperatorType":"L", "id":"21"},
+      {"Variable":"Model","SelectType":"MultiSelect","DBField":"CISS.VEH.MODEL","OperatorType":"L","id":"22"},
+      {"Variable":"Body Category","SelectType":"Dropdown","DBField":"CISS.VEH.BODYCAT","OperatorType":"L","id":"23",
       "Values":[{"Value":1,"ValueText":"Automobiles"},
         {"Value":2,"ValueText":"Automobile Derivatives"},
         {"Value":3,"ValueText":"Utility Vehicles"},
@@ -338,7 +340,7 @@
         {"Value":11,"ValueText":"Motor Homes"},
         {"Value":-9999,"ValueText":"Unknown Body Type"}]},
 
-      {"Variable":"Model Year","SelectType":"MultiSelect","DBField":"CISS.VEH.MODELYEAR","OperatorType":"N",
+      {"Variable":"Model Year","SelectType":"MultiSelect","DBField":"CISS.VEH.MODELYEAR","OperatorType":"N","id":"24",
         "Values":[{"Value":-1      ,"ValueText":"Blanks"},
           {"Value":9999 ,"ValueText":"Unknown"},
           {"Value":9998 ,"ValueText":"Not Reported"},
@@ -447,8 +449,9 @@
 
   {
     "Group":"Vehicle Damage",
+    "id":"3",
     "Fields":
-      [{"Variable":"Plane of Impact","SelectType":"Dropdown","DBField":"CISS.DEFORM.Defloc","OperatorType":"L",
+      [{"Variable":"Plane of Impact","SelectType":"Dropdown","DBField":"CISS.DEFORM.Defloc","OperatorType":"L","id":"31",
       "Values":[{"Value":1,"ValueText":"F Front"},
         {"Value":2,"ValueText":"B Back (rear)"},
         {"Value":3,"ValueText":"L Left side"},
@@ -463,7 +466,7 @@
         {"Value":40,"ValueText":"Unintended Acceleration (UA)"},
         {"Value":41,"ValueText":"Unknown"}]},
 
-      {"Variable":"Plane Sub-Section","SelectType":"Dropdown","DBField":"CISS.DEFORM.Longlatloc","OperatorType":"L",
+      {"Variable":"Plane Sub-Section","SelectType":"Dropdown","DBField":"CISS.DEFORM.Longlatloc","OperatorType":"L","id":"32",
       "Values":[{"Value":3,"ValueText":"C  Center - front or rear"},
         {"Value":1,"ValueText":"D  Distributed-side or end"},
         {"Value":2,"ValueText":"L  Left - front or rear"},
@@ -475,22 +478,22 @@
         {"Value":7,"ValueText":"B  Side rear - left or right"},
         {"Value":-9999,"ValueText":"9 Unknown"}]},
 
-      {"Variable":"PDOF","SelectType":"Range","DBField":"CISS.DEFORM.DOF","OperatorType":"N","Units":
+      {"Variable":"PDOF","SelectType":"Range","DBField":"CISS.DEFORM.DOF","OperatorType":"N","id":"33","Units":
       ["degrees"]},
-      {"Variable":"Delta V","SelectType":"Range","DBField":"CISS.Deform.DVTotal","OperatorType":"N",
+      {"Variable":"Delta V","SelectType":"Range","DBField":"CISS.Deform.DVTotal","OperatorType":"N","id":"34",
       "Units":["mph","kmph"]},
-      {"Variable":"Barrier Equivalent Speed","SelectType":"Range","DBField":"DEFORM.DVBARRIER","OperatorType":"N",
+      {"Variable":"Barrier Equivalent Speed","SelectType":"Range","DBField":"DEFORM.DVBARRIER","OperatorType":"N","id":"35",
         "Units":["mph","kmph"]},
-      {"Variable":"Rollover","SelectType":"Check box","DBField":"CISS.DEFORM.Distribution=","OperatorType":"L"},
-      {"Variable":"Electronic Data Recorder","SelectType":"Check box","DBField":"N/A","OperatorType":"L"},
-      {"Variable":"Crash Avoidance Equipment Available","SelectType":"Dropdown","DBField":"N/A","OperatorType":"L",
+      {"Variable":"Rollover","SelectType":"Check box","DBField":"CISS.DEFORM.Distribution=","OperatorType":"L","id":"36"},
+      {"Variable":"Electronic Data Recorder","SelectType":"Check box","DBField":"N/A","OperatorType":"L","id":"37"},
+      {"Variable":"Crash Avoidance Equipment Available","SelectType":"Dropdown","DBField":"N/A","OperatorType":"L","id":"38",
       "Values":[{"Value":1,"ValueText":"Assisted Braking"},
         {"Value":3,"ValueText":"Blind Spot Detection"},
         {"Value":5,"ValueText":"FCW with Auto Braking"},
         {"Value":6,"ValueText":"FCW without Auto Braking"},
         {"Value":7,"ValueText":"LDW with Lane Keeping"},
         {"Value":8,"ValueText":"LDW without Lane Keeping"}]},
-      {"Variable":"Crash Avoidance Equipment Activated","SelectType":"Dropdown","DBField":"N/A","OperatorType":"L",
+      {"Variable":"Crash Avoidance Equipment Activated","SelectType":"Dropdown","DBField":"N/A","OperatorType":"L","id":"39",
         "Values":[{"Value":1,"ValueText":"Assisted Braking"},
           {"Value":3,"ValueText":"Blind Spot Detection"},
           {"Value":5,"ValueText":"FCW with Auto Braking"},
@@ -502,6 +505,7 @@
 
   {
    "Group": "Occupant",
+    "id":"4",
    "Fields":
      [{"Variable":"Age","SelectType":"Range","DBField":"CISS.OCC.AGE","OperatorType":"N",
      "Units":["Months","Year"]},
@@ -544,7 +548,8 @@
 
   {
     "Group": "Injury",
-    "Fields":[{"Variable":"Body Region","SelectType":"Dropdown","DBField":"BRI","OperatorType":"L",
+    "id":"5",
+    "Fields":[{"Variable":"Body Region","SelectType":"Dropdown","DBField":"BRI","OperatorType":"L","id":"51",
                 "Values":[{"Value":1,"ValueText":"Abdomen"},
                   {"Value":2,"ValueText":"Ankle - foot"},
                   {"Value":3,"ValueText":"Arm (upper)"},
@@ -564,14 +569,15 @@
                   {"Value":17,"ValueText":"Thigh"},
                   {"Value":18,"ValueText":"Upper limb(s) (whole or unknown part)"},
                   {"Value":19,"ValueText":"Wrist - hand"}]},
-      {"Variable":"AIS/NASS Code","SelectType":"Textbox","DBField":"AIS.Code","OperatorType":"T"},
-      {"Variable":"Max AIS","SelectType":"Range","DBField":"This is from VAID (only the 7th digit of the AIS Code)","OperatorType":"T"},
-      {"Variable":"ISS(injury Severity Score)","SelectType":"Range","DBField":"N/A","OperatorType":"L"}]
+      {"Variable":"AIS/NASS Code","SelectType":"Textbox","DBField":"AIS.Code","OperatorType":"T","id":"52"},
+      {"Variable":"Max AIS","SelectType":"Range","DBField":"This is from VAID (only the 7th digit of the AIS Code)","OperatorType":"T","id":"53"},
+      {"Variable":"ISS(injury Severity Score)","SelectType":"Range","DBField":"N/A","OperatorType":"L","id":"54"}]
   },
 
   {
     "Group":"Restraint Use",
-    "Fields":[{"Variable":"Air Bag location","SelectType":"Dropdown","DBField":"CISS.AIRBAG.LOCATION","OperatorType":"L",
+    "id":"6",
+    "Fields":[{"Variable":"Air Bag location","SelectType":"Dropdown","DBField":"CISS.AIRBAG.LOCATION","OperatorType":"L","id":"61",
                 "Values":[{"Value":1,"ValueText":"Bottom Instrument Panel"},
                   {"Value":2,"ValueText":"Door/Panel"},
                   {"Value":3,"ValueText":"Mid Instrument Panel"},
@@ -581,7 +587,7 @@
                   {"Value":7,"ValueText":"Steering Wheel Hub"},
                   {"Value":8,"ValueText":"Top Instrument Panel"},
                   {"Value":11,"ValueText":"Unknown"}]},
-      {"Variable":"Air Bag Deployed","SelectType":"Dropdown","DBField":"CISS.AIRBAG.DEPLOY","OperatorType":"L",
+      {"Variable":"Air Bag Deployed","SelectType":"Dropdown","DBField":"CISS.AIRBAG.DEPLOY","OperatorType":"L","id":"62",
         "Values":[{"Value":1,"ValueText":"Deployed during crash (as a result of impact)"},
           {"Value":2,"ValueText":"Deployed inadvertently just prior to crash"},
           {"Value":3,"ValueText":"Deployed, details unknown"},
@@ -590,7 +596,7 @@
           {"Value":-8871,"ValueText":"No air bag available for this crash (disconnected/not reinstalled)"},
           {"Value":-8870,"ValueText":"Unknown status if air bag available for this crash"},
           {"Value":6,"ValueText":"Unknown if Deployed"}]},
-      {"Variable":"Child Seat Used","SelectType":"Dropdown","DBField":"CISS.CISS.CHILDSEAT.","OperatorType":"L",
+      {"Variable":"Child Seat Used","SelectType":"Dropdown","DBField":"CISS.CISS.CHILDSEAT.","OperatorType":"L","id":"63",
          "Values":[{"Value":1,"ValueText":"No"},
            {"Value":2,"ValueText":"Yes"},
            {"Value":3,"ValueText":"Unknown"}]}]
