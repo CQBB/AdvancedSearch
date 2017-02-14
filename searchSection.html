@@ -28,30 +28,52 @@
 <div class="container">
 <h2>Advanced Search</h2>
     <div class="row">
-        <div class="col-lg-4">
-            <b>Fields</b>
-            <div><div id="fields" class='panel-group'></div></div>
+
+        <div class="col-sm-4">
+            <div class="title">Fields</div>
+            <div id="fields" class='panel-group'></div>
             <br>
             <!--<b>Saved Search</b>
             <table class="table table-hover" id="savedSearches"></table>-->
-
-
-
-        </div>
-        <div class="col-lg-6">
-            <b>Conditions</b>
-            <div id='container' class='panel panel-default selected row group-container' tabindex='-1'></div>
-        </div>
-        <div class="col-lg-2">
-            <br><br>
-            <button id="addGroup" class="btn btn-primary" style="margin-bottom: 5px">Add Group</button>
-            <button id="getJson" class="btn btn-primary" style="margin-bottom: 5px">Generate Transport Data</button>
-            <button id="removeAll" class="btn btn-primary" style="margin-bottom: 5px">Remove All</button>
-            <!--<button id="saveSearch" class="btn btn-primary" style="margin-bottom: 5px">Save Search</button>-->
-            <div id='query'></div>
         </div>
 
+        <div class="col-sm-8" >
+            <div class="pull-right btn-group fixed">
+                <button id="addGroup" class="btn btn-primary">Add Group</button>
+                <button id="getJson" class="btn btn-primary">Generate SQL Query</button>
+                <button id="removeAll" class="btn btn-primary">Remove All</button>
+            </div>
+            <div class="title">
+                Conditions
+            </div>
+
+            <div id='container' class='selected group-container as-row' tabindex='-1'></div>
+        </div>
+
+        <hr />
+        <div id='sql'>
+            <div id="select"></div>
+            <div id="from"></div>
+            <div id="where"></div>
+        </div>
     </div>
+
+
+
+    <div class="modal fade" tabindex="-1" role="dialog" id="removeAllModal">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">Are you sure to remove all the conditions?</h4>
+                </div>
+                <div class="modal-footer remove-modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">No</button>
+                    <button type="button" class="btn btn-primary" id="removeConfirmBtn">Yes</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
 
     <div class="modal fade" tabindex="-1" role="dialog" id="saveModal">
         <div class="modal-dialog" role="document">
@@ -69,6 +91,25 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                     <button type="button" class="btn btn-primary" id="saveSearchModal">Save</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
+
+    <div class="modal fade" tabindex="-1" role="dialog" id="queryModal">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+
+                </div>
+                <div class="modal-body">
+                  <div>
+                      <ul id="erroMsg">
+
+                      </ul>
+                  </div>
                 </div>
             </div><!-- /.modal-content -->
         </div><!-- /.modal-dialog -->

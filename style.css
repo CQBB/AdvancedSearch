@@ -3,10 +3,11 @@
 .group {
     min-height:200px;
     margin:10px;
-    border-style:solid;
+    border:1px solid #191919;
     padding:5px;
-
+    height:auto;
     background-color:rgb(245,245,245);
+    border-radius:0px;
 }
 
 td{
@@ -14,12 +15,14 @@ td{
 }
 
 .group-container{
-    min-height:200px;
+    min-height:800px;
     background-color:rgb(245,245,245);
-    border-style:solid;
-    padding:5px;
-
+    border:1px solid #191919;
+    padding-top:5px;
+    height:auto;
     width:100%;
+    border-radius:0px;
+    box-shadow: 0 1px 1px rgba(0,0,0,0.05);
 }
 
 .selected {
@@ -35,23 +38,29 @@ button{
     height: 28px;
     width:85px;
 }
-.row
+
+.as-row
 {
-    margin:5px 0px 5px 0px;
+    margin:10px;
 }
 
 .right{
     height:28px;
-    -webkit-border-radius:4px ;
     padding-left:2px;
     padding-right: 2px;
     max-width:200px;
+    border-radius:0px;
 }
 
 .select2-selection:hover{
     background-color: #cbd1db;
 }
 
+.remove-modal-footer{
+    margi-top:0px;
+    border-top:0px;
+    text-align: center;
+}
 
 
 .andorSelect{
@@ -83,8 +92,12 @@ button{
 }
 
 #fields{
-    max-height: 600px;
-    overflow-y:scroll
+    /* max-height: 750px;
+     overflow-y:scroll;*/
+    background-color: rgb(245,245,245);
+    height: 800px;
+    padding-right: 10px;
+    padding-top: 5px;
 }
 
 .value-container{
@@ -106,6 +119,7 @@ button{
     margin-top:5px !important;
     margin-bottom:5px !important;
     border-radius: 0px !important;
+    background-color: #e5e5e5;
 }
 
 .field-container{
@@ -115,10 +129,10 @@ button{
 }
 
 .condition-container{
-    border-radius: 5px;
+
     padding: 5px;
     border: 1px solid #EEE;
-    background: rgb(245,245,245);
+    xbackground: rgb(245,245,245);
 }
 
 .field-group-heading{
@@ -133,8 +147,8 @@ button{
 }
 
 .field-group-heading-selected{
-   background-color:  #c7c7c7 !important;
-   border-left:   8px solid #7c7b7b !important;
+    background-color:  #c7c7c7 !important;
+    border-left:   8px solid #7c7b7b !important;
     -webkit-box-shadow: 1px 10px 16px -5px rgba(97,97,97,1);
     -moz-box-shadow: 1px 10px 16px -5px rgba(97,97,97,1);
     box-shadow: 1px 7px 10px -2px rgba(97,97,97,1);
@@ -166,4 +180,38 @@ button{
     display: inline-block;
     text-align: left;
     vertical-align: middle;
+}
+
+.left-container{
+    background-color: #e5e5e5;
+    height: 800px;
+}
+
+.title{
+    border-bottom: 1px solid #b6b6b6;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    font-size: x-large;
+    padding-bottom: 10px;
+}
+
+.btn-group{
+    margin-top:10px;
+}
+
+.btn{
+    border-radius:0px;
+}
+
+[class^='select2'] {
+    border-radius: 0px !important;
+}
+
+#fields table{
+    margin-top:10px;
+}
+
+.required-msg{
+    padding-top: 5px;
+
 }

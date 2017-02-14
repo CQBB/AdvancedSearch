@@ -44,11 +44,11 @@
       {"Value":41,"ValueText":"Unknown"}]},
 
 
-      {"Variable":"Year","SelectType":"Dropdown","DBField":"CISS.CRASH.CASEYEAR","OperatorType":"L","id":"12",
+      {"Variable":"Year","SelectType":"Dropdown","DBField":"CISS.CRASH.CASEYEAR","OperatorType":"N","id":"12",
       "Values":[{"Value":"2016","ValueText":"2016"},
         {"Value":"2015","ValueText":"2015"}]},
 
-      {"Variable":"Month","SelectType":"Dropdown","DBField":"month(CISS.CRASH.crashdate)","OperatorType":"L","id":"13",
+      {"Variable":"Month","SelectType":"Dropdown","DBField":"month(CISS.CRASH.crashdate)","OperatorType":"N","id":"13",
       "Values":[{"Value":"Jan","ValueText":"Jan"},
         {"Value":"Feb","ValueText":"Feb"},
         {"Value":"Mar","ValueText":"Mar"},
@@ -479,13 +479,22 @@
         {"Value":-9999,"ValueText":"9 Unknown"}]},
 
       {"Variable":"PDOF","SelectType":"Range","DBField":"CISS.DEFORM.DOF","OperatorType":"N","id":"33","Units":
-      ["degrees"]},
-      {"Variable":"Delta V","SelectType":"Range","DBField":"CISS.Deform.DVTotal","OperatorType":"N","id":"34",
+      ["degrees"],"Validation":"1"},
+      {"Variable":"Delta V","SelectType":"Range","DBField":"CISS.Deform.DVTotal","OperatorType":"N","id":"34","Validation":"1",
       "Units":["mph","kmph"]},
-      {"Variable":"Barrier Equivalent Speed","SelectType":"Range","DBField":"DEFORM.DVBARRIER","OperatorType":"N","id":"35",
+      {"Variable":"Barrier Equivalent Speed","SelectType":"Range","DBField":"DEFORM.DVBARRIER","OperatorType":"N","id":"35","Validation":"1",
         "Units":["mph","kmph"]},
-      {"Variable":"Rollover","SelectType":"Check box","DBField":"CISS.DEFORM.Distribution=","OperatorType":"L","id":"36"},
-      {"Variable":"Electronic Data Recorder","SelectType":"Check box","DBField":"N/A","OperatorType":"L","id":"37"},
+      {"Variable":"Rollover","SelectType":"Dropdown","DBField":"CISS.DEFORM.Distribution=","OperatorType":"L","id":"36",
+        "Values":[
+          {"Value":1,"ValueText":"True"},
+          {"Value":0,"ValueText":"False"}
+        ]
+      },
+      {"Variable":"Electronic Data Recorder","SelectType":"Dropdown","DBField":"N/A","OperatorType":"L","id":"37",
+      "Values":[
+        {"Value":1,"ValueText":"True"},
+        {"Value":0,"ValueText":"False"}
+      ]},
       {"Variable":"Crash Avoidance Equipment Available","SelectType":"Dropdown","DBField":"N/A","OperatorType":"L","id":"38",
       "Values":[{"Value":1,"ValueText":"Assisted Braking"},
         {"Value":3,"ValueText":"Blind Spot Detection"},
@@ -507,7 +516,7 @@
    "Group": "Occupant",
     "id":"4",
    "Fields":
-     [{"Variable":"Age","SelectType":"Range","DBField":"CISS.OCC.AGE","OperatorType":"N",
+     [{"Variable":"Age","SelectType":"Range","DBField":"CISS.OCC.AGE","OperatorType":"N","Validation":"1",
      "Units":["Months","Year"]},
       {"Variable":"Sex","SelectType":"MultiSelect","DBField":"CISS.OCC.GENDER","OperatorType":"L",
         "Values":[{"Value":1,"ValueText":"Female"},
@@ -538,9 +547,9 @@
           {"Value":13,"ValueText":"Fifth Row Left "},
           {"Value":14,"ValueText":"Fifth Row Middle"},
           {"Value":15,"ValueText":"Fifth Row Right"}]},
-      {"Variable":"Height","SelectType":"Range","DBField":"CISS.OCC.HEIGHT","OperatorType":"N",
+      {"Variable":"Height","SelectType":"Range","DBField":"CISS.OCC.HEIGHT","OperatorType":"N","Validation":"1",
         "Units":["cm","in"]},
-      {"Variable":"Weight","SelectType":"Range","DBField":"CISS.OCC.WEIGHT","OperatorType":"N",
+      {"Variable":"Weight","SelectType":"Range","DBField":"CISS.OCC.WEIGHT","OperatorType":"N","Validation":"1",
         "Units":["kg","lb"]}]
   },
 
@@ -569,9 +578,9 @@
                   {"Value":17,"ValueText":"Thigh"},
                   {"Value":18,"ValueText":"Upper limb(s) (whole or unknown part)"},
                   {"Value":19,"ValueText":"Wrist - hand"}]},
-      {"Variable":"AIS/NASS Code","SelectType":"Textbox","DBField":"AIS.Code","OperatorType":"T","id":"52"},
-      {"Variable":"Max AIS","SelectType":"Range","DBField":"This is from VAID (only the 7th digit of the AIS Code)","OperatorType":"T","id":"53"},
-      {"Variable":"ISS(injury Severity Score)","SelectType":"Range","DBField":"N/A","OperatorType":"L","id":"54"}]
+      {"Variable":"AIS/NASS Code","SelectType":"Textbox","DBField":"AIS.Code","OperatorType":"T","id":"52","Validation":"1"},
+      {"Variable":"Max AIS","SelectType":"Range","DBField":"This is from VAID (only the 7th digit of the AIS Code)","OperatorType":"N","id":"53","Validation":"1"},
+      {"Variable":"ISS(injury Severity Score)","SelectType":"Range","DBField":"N/A","OperatorType":"N","id":"54","Validation":"1"}]
   },
 
   {
@@ -601,5 +610,4 @@
            {"Value":2,"ValueText":"Yes"},
            {"Value":3,"ValueText":"Unknown"}]}]
   }
-]
-}
+]}
