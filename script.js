@@ -2,6 +2,30 @@
  * Created by fyang on 1/23/2017.
  */
 // Code goes here
+var equalOperatorPool = ["Make", "Model"];
+var items = [];
+var operatorPool=[
+    {
+        "OperatorCate":"L",//lookup
+        "Operators":['=','!=']
+    },
+    {
+        "OperatorCate":"N",//Numeric
+        "Operators":['=','!=','&gt','&gt=','&lt','&lt=']
+    },
+    {
+        "OperatorCate":"T",//Text
+        "Operators":['=','!=','like','end with','start with']
+    }
+
+];
+
+var fieldData=[];
+
+var removeBtn = " <button type='button' class='btn btn-danger btn-xs remove pull-right'> <span class='glyphicon glyphicon-remove'></span></button>";
+var isFieldValid=true;
+var counter=1;
+
 
 var myGroups={"Groups":[
     {
@@ -521,9 +545,9 @@ var myGroups={"Groups":[
         "Group": "Occupant",
         "id":"4",
         "Fields":
-            [{"Variable":"Age","SelectType":"Range","DBField":"CISS.OCC.AGE","OperatorType":"N","Validation":"1",
+            [{"Variable":"Age","SelectType":"Range","DBField":"CISS.OCC.AGE","OperatorType":"N","Validation":"1","id":"41",
                 "Units":["Months","Year"]},
-                {"Variable":"Sex","SelectType":"MultiSelect","DBField":"CISS.OCC.GENDER","OperatorType":"L",
+                {"Variable":"Sex","SelectType":"MultiSelect","DBField":"CISS.OCC.GENDER","OperatorType":"L","id":"42",
                     "Values":[{"Value":1,"ValueText":"Female"},
                         {"Value":2,"ValueText":"Male"},
                         {"Value":4,"ValueText":"Unknown"},
@@ -531,12 +555,12 @@ var myGroups={"Groups":[
                         {"Value":6,"ValueText":"Female, pregnant - 2nd trimester (4th-6th month)"},
                         {"Value":7,"ValueText":"Female, pregnant - 3rd trimester (7th-9th month)"},
                         {"Value":8,"ValueText":"Female, pregnant - trimester unknown"}]},
-                {"Variable":"Mortality/Injury Severity","SelectType":"Dropdown","DBField":"N/A","OperatorType":"L",
+                {"Variable":"Mortality/Injury Severity","SelectType":"Dropdown","DBField":"N/A","OperatorType":"L","id":"43",
                     "Values":[{"Value":1,"ValueText":"Fatality"},
                         {"Value":2,"ValueText":"Serious Injury"},
                         {"Value":3,"ValueText":"Minor/Moderate Injury"},
                         {"Value":4,"ValueText":"No Injury"}]},
-                {"Variable":"Seat Position","SelectType":"Dropdown","DBField":"CISS.SEATLOC.SEATLOCATION","OperatorType":"L",
+                {"Variable":"Seat Position","SelectType":"Dropdown","DBField":"CISS.SEATLOC.SEATLOCATION","OperatorType":"L","id":"44",
                     "Values":[{"Value":1,"ValueText":"Front Row Left "},
                         {"Value":2,"ValueText":"Front Row Middle"},
                         {"Value":3,"ValueText":"Front Row Right "},
@@ -552,9 +576,9 @@ var myGroups={"Groups":[
                         {"Value":13,"ValueText":"Fifth Row Left "},
                         {"Value":14,"ValueText":"Fifth Row Middle"},
                         {"Value":15,"ValueText":"Fifth Row Right"}]},
-                {"Variable":"Height","SelectType":"Range","DBField":"CISS.OCC.HEIGHT","OperatorType":"N","Validation":"1",
+                {"Variable":"Height","SelectType":"Range","DBField":"CISS.OCC.HEIGHT","OperatorType":"N","Validation":"1","id":"45",
                     "Units":["cm","in"]},
-                {"Variable":"Weight","SelectType":"Range","DBField":"CISS.OCC.WEIGHT","OperatorType":"N","Validation":"1",
+                {"Variable":"Weight","SelectType":"Range","DBField":"CISS.OCC.WEIGHT","OperatorType":"N","Validation":"1","id":"46",
                     "Units":["kg","lb"]}]
     },
 
@@ -616,114 +640,99 @@ var myGroups={"Groups":[
                     {"Value":3,"ValueText":"Unknown"}]}]
     }
 ]};
+
+
+//Form the json object for single condition
+function getSingleConditionData(condition) {
+    var fieldTxt = condition.find('.field').attr('value');
+    var operatorTxt = "";
+    var operator = condition.find('.operator');
+    var right = condition.find('.right');
+    var rightTxt = "";
+    var data={};
+
+    operatorTxt = operator.find('option:selected').text();
+
+
+    var selected=right.find('option:selected');
+    if(selected.length>1)//mutiSelect
+    {
+        var rigthtTxtArray=[];
+        $.each(selected,function (i,s) {
+            rigthtTxtArray.push($(s).attr('value'));
+        });
+        rightTxt='('+rigthtTxtArray.join(',')+')';
+        if(operatorTxt=='=')
+        {
+            operatorTxt='IN';
+        }
+        else
+        {
+            operatorTxt='NOT IN';
+        }
+
+    }
+    else if(selected.length==1)
+    {
+        rightTxt = right.find('option:selected').attr('value');
+    }else
+    {
+        rightTxt=right.val();
+    }
+
+
+    data.type='condition';
+    data.id=fieldTxt;
+    data.relation=operatorTxt;
+    data.value=rightTxt;
+    data.variable=condition.find('.field').text();
+    return data;
+}
+
+
+function generateTransportData(condition) {
+    var dataAaray=[];
+    var data={};
+    condition.children('div').each(function() {
+
+        var current = $(this);
+
+        var isGroup = current.hasClass('group');
+        var temp = {};
+        if (current.hasClass('andor')){
+            //find the andor select
+            var andorselect = current.find('.andorSelect');
+            var value = andorselect.find('option:selected').text();
+
+            temp.type='operator';
+            temp.value=value;
+        } else if (!isGroup && current.hasClass('condition')) //straight single condition
+        {
+            temp = getSingleConditionData(current);
+        } else if (isGroup) //group recurse
+        {
+            //temp = "{'type':'group','conditions':["+generateTransportData(current)+"]}";
+            temp.type='group';
+            temp.conditions= generateTransportData(current);
+
+        }
+        if(!$.isEmptyObject(temp))
+            dataAaray.push(temp);
+
+    });
+
+
+    return dataAaray;
+}
+
+
 $(document).ready(function() {
 
-    var equalOperatorPool = ["Make", "Model"];
-    var items = [];
-    var operatorPool=[
-        {
-            "OperatorCate":"L",//lookup
-            "Operators":['=','!=']
-        },
-        {
-            "OperatorCate":"N",//Numeric
-            "Operators":['=','!=','&gt','&gt=','&lt','&lt=']
-        },
-        {
-            "OperatorCate":"T",//Text
-            "Operators":['=','!=','like','end with','start with']
-        }
 
-    ];
+    getAllVehicleMakes();
+    getAllVehicleModels();
 
-    var fieldData=[];
-    var models={};
-    var makes={};
-    var removeBtn = " <button type='button' class='btn btn-danger btn-xs remove pull-right'> <span class='glyphicon glyphicon-remove'></span></button>";
-    var isFieldValid=true;
-
-        //Get all vehicle makes
-        function getAllVehicleMakes() {
-
-            $.ajax({
-                url:"https://vpic.nhtsa.dot.gov/api/vehicles/getvehiclevariablevalueslist/NCSA%20Make?format=json",
-                async:false,
-                dataType:'json',
-                success:function (data) {
-                    makes=data.Results;
-                    makes=_.sortBy(makes,function (m) {
-                        return m.Name;
-                    })
-                }
-            });
-
-        }
-        getAllVehicleMakes();
-        //get all models
-        function getAllVehicleModels() {
-
-            $.ajax({
-                url:"https://vpic.nhtsa.dot.gov/api/vehicles/getvehiclevariablevalueslist/NCSA%20Model?format=json",
-                async:false,
-                dataType:'json',
-                success:function (data) {
-                    models=data.Results;
-                    models=addMakeIdAndNameToModel(models);
-                    models=_.sortBy(models,function (m) {
-                        return m.Name;
-                    })
-                }
-            });
-
-        }
-        getAllVehicleModels();
-        //Get the make from model id
-        function getMakeByModelId(modelId) {
-            var make={};
-            var modelIdString=modelId.toString();
-            make.makeId=modelIdString.substr(0,modelIdString.length-6);
-            make=_.find(makes,function (m) {
-                return m.Id==make.makeId;
-            });
-            return make;
-        }
-
-
-        function addMakeIdAndNameToModel(models) {
-            var make = {};
-            var makeName='';
-            $.each(models,function (i,model) {
-                make=getMakeByModelId(model.Id);
-                model.makeId=make.Id;
-                model.makeName=make.Name;
-            });
-            return models;
-        }
-
-
-        //Group the models from current make listed
-        function getGroupedModelsFromCurrMakes() {
-            var makeSelects=$('#container').find('.makeSelect');
-            var selectedMakes=makeSelects.find('option:selected');
-            var makeNames=[];
-            var groupedModels={};
-            $.each(selectedMakes,function (i,selectedMake) {
-                makeNames.push(selectedMake.text);
-            });
-            makeNames.sort();
-            var modelsUnderSelectedMakes=_.filter(models,function (model) {
-                return makeNames.indexOf(model.makeName)!=-1;
-            });
-
-            modelsUnderSelectedMakes=_.sortBy(modelsUnderSelectedMakes,function (m) {
-                return m.makeName;
-            });
-            groupedModels=_.groupBy(modelsUnderSelectedMakes,function (m) {
-                return m.makeName;
-            });
-
-            return groupedModels;
-        }
+    populateFields();
 
     $('#getJson').prop('disabled',true);
     $('#getJson').click(function () {
@@ -732,11 +741,12 @@ $(document).ready(function() {
         data.conditions = jarray;
 
 
+
         console.log(data);
         //console.log(getSqlQueryFromJson(data));
         //console.log(JSON.stringify(data));
         $('#erroMsg').empty();
-        if (validateInputs()) {
+        if (validateGroups()&&$('form').valid()) {
 
         $.post("http://localhost:49468/api/AdvancedSearch", data, function (data) {
             var query = data;
@@ -751,47 +761,40 @@ $(document).ready(function() {
             $('#queryModal').modal('show');
         });
         }
-        else{
+        else if(!validateGroups()){
 
-            $('#queryModal').modal('show');
+            $('#groupErrorMsg').modal('show');
+
         }
 
     });
 
-    function validateInputs() {
-        var inputs=$('#container').find('.right-textbox');
+
+    $('form').validate(
+        {
+            rules:{
+                'input_text[]':"required",
+                'multiselect[]':"required"
+            },
+            submitHandler:function(){
+                return false;
+            }
+        }
+    );
+
+
+
+    function validateGroups() {
+
         var groups=$('#container').find('.group');
         var isValid=true;
-        var isRequiredAdded=false;
-        $.each(inputs,function (i,item) {
-            if($(item).val().length==0)
-            {
-                var requiredMsg=$("<div class='required-msg text-danger'>  This field is required</div>");
-                if(!$(item).next().hasClass('required-msg'))
-                $(item).after(requiredMsg);
-                isValid=false;
-               if(!isRequiredAdded)//add the warning just once
-               {
-                   var fieldError=$("<li class='text-danger'>Required fields are missing.</li>");
-                   $('#erroMsg').append(fieldError);
-                   isRequiredAdded=true;
-               }
 
-            }
-            else{
-                if($(item).next().hasClass('required-msg')){
-                    $(item).next().remove();
-                }
-            }
-
-        });
 
         $.each(groups, function (i,g) {
            var conditions=$(g).find('.condition');
            if(conditions.length==0) {
                isValid = false;
-               var groupError=$("<li class='text-danger'>Groups should not be empty.</li>");
-               $('#erroMsg').append(groupError);
+
                return false;
            }
         });
@@ -812,30 +815,17 @@ $(document).ready(function() {
         $('.andorSelect').select2({
             minimumResultsForSearch: -1
         });
-        updateQuery();
+       // updateQuery();
     });
 
-    function addBlankGroup(selectedGroup) {
-        var groupBox = $("<div class='group condition panel panel-default row as-row' tabindex='-1'></div>");
-        var removeRow=$("<div class='row removeRow as-row'></div>");
-        var removeBtn=$("<button type='button' class='btn btn-danger pull-right remove btn-xs'><span class='glyphicon glyphicon-remove'></span>Remove Group</button>");
-        selectedGroup.append(groupBox);
-
-        removeRow.append(removeBtn);
-        groupBox.append(removeRow);
-        selectedGroup.removeClass('selected');
-        groupBox.addClass("selected");
-
-
-        return groupBox;
-    };
 
 
 
-    $('#getConditionString').click(function() {
+
+  /*  $('#getConditionString').click(function() {
 
         updateQuery();
-    });
+    });*/
 
     $('#removeAll').click(function () {
       $('#removeAllModal').modal('show');
@@ -848,103 +838,13 @@ $(document).ready(function() {
         $('#getJson').prop('disabled',true);
     });
 
-    function updateQuery() {
-        var condition = $('#container');
-        var query = getConditionStringsFromGroup(condition);
-        $('#query').text(query);
-    }
-
-    function getConditionStringsFromGroup(condition) {
-        var query = '';
-        condition.children('div').each(function() {
-
-            var current = $(this);
-
-            var isGroup = current.hasClass('group');
-            var temp = '';
-            if (current.hasClass('andor')){
-                //find the andor select
-                var andorselect = current.find('.andorSelect');
-                temp = andorselect.find('option:selected').text();
-            } else if (!isGroup && current.hasClass('condition')) //straight single condition
-            {
-                temp = getSingleConditionString(current);
-            } else if (isGroup) //group recurse
-            {
-                temp = '(' + getConditionStringsFromGroup(current) + ')';
-            }
-            query = query + '  ' + temp;
-
-        });
-
-        return query;
-    }
-
-
-    function getSqlQueryFromJson(data) {
-        var query='';
-        var conditions=data;
-        $.each(conditions,function (i,condition) {
-            var temp='';
-            switch(condition.type){
-                case "condition":
-                    temp=getSingleConditionJson(condition);
-                    break;
-                case "operator":
-                    temp=condition.value;
-                    break;
-                case "group":
-                    temp= '(' + getSqlQueryFromJson(condition.conditions)+ ')';
-                    break;
-            }
-
-            query=query+' '+temp;
-        });
-
-        return query;
-    }
-
-    function generateTransportData(condition) {
-        var dataAaray=[];
-        var data={};
-        condition.children('div').each(function() {
-
-            var current = $(this);
-
-            var isGroup = current.hasClass('group');
-            var temp = {};
-            if (current.hasClass('andor')){
-                //find the andor select
-                var andorselect = current.find('.andorSelect');
-                var value = andorselect.find('option:selected').text();
-
-                temp.type='operator';
-                temp.value=value;
-            } else if (!isGroup && current.hasClass('condition')) //straight single condition
-            {
-                temp = getSingleConditionData(current);
-            } else if (isGroup) //group recurse
-            {
-                //temp = "{'type':'group','conditions':["+generateTransportData(current)+"]}";
-                temp.type='group';
-                temp.conditions= generateTransportData(current);
-
-            }
-            if(!$.isEmptyObject(temp))
-                dataAaray.push(temp);
-
-        });
-
-
-        return dataAaray;
-    }
 
 
 
-    //Event delegate to select change, then update query.
+   /* //Event delegate to select change, then update query.
     $('#container').on('change','select',function (e) {
         updateQuery();
-    });
+    });*/
 
 
 
@@ -952,7 +852,7 @@ $(document).ready(function() {
     $('#container').on('click', '.group', function(e) {
         $('.selected').removeClass('selected');
         $(this).addClass("selected");
-        updateQuery();
+      //  updateQuery();
         e.stopPropagation();
 
     });
@@ -1007,7 +907,7 @@ $(document).ready(function() {
         }
 
         parent.remove();
-        updateQuery();
+       // updateQuery();
         e.stopPropagation();
         if($('#container').is(':empty')){
             $('#getJson').prop('disabled',true);
@@ -1031,54 +931,23 @@ $(document).ready(function() {
 
 
 
-        updateQuery();
+       // updateQuery();
         e.stopPropagation();
         $('#getJson').prop('disabled',false);
     });
 
 
 
-    function setHtmlBehavior(field,condition) {
-        $('.andorSelect').select2({
-            minimumResultsForSearch: -1
-        });
-        $('.operator').select2({
-            minimumResultsForSearch: -1
-        });
-
-        var select=condition.find('.right');
-        if(field.SelectType=='MultiSelect')
-        {
-            select.select2({
-                allowClear:true,
-                closeOnSelect:false
-            });
-        }else if(field.SelectType=='Dropdown')
-        {
-            select.select2({
-                minimumResultsForSearch: -1
-            });
-        }
-
-        $('select').on("select2:select", function (e) {
-            $(window).scroll();
-        });
-
-        if(field.OperatorType=='N')
-            condition.find('.right').keyup(function () {
-                this.value = this.value.replace(/[^0-9\.]/g,'');
-            });
-
-    }
 
 
-    //Save search click
+
+  /*  //Save search click
     $('#saveSearch').click(function (e) {
         e.preventDefault();
         $('#saveModal').modal('show');
 
     });
-
+*/
 
 
     $('#saveSearchModal').click(function (){
@@ -1149,8 +1018,41 @@ $(document).ready(function() {
         $('#where').text('');
     });
 
+    function setHtmlBehavior(field,condition) {
+        $('.andorSelect').select2({
+            minimumResultsForSearch: -1
+        });
+        $('.operator').select2({
+            minimumResultsForSearch: -1
+        });
 
-    $('#savedSearches').on('click','.remove-search',function (e) {
+        var select=condition.find('.right');
+        if(field.SelectType=='MultiSelect')
+        {
+            select.select2({
+                allowClear:true,
+                closeOnSelect:false
+            });
+        }else if(field.SelectType=='Dropdown')
+        {
+            select.select2({
+                minimumResultsForSearch: -1
+            });
+        }
+
+        $('select').on("select2:select", function (e) {
+            $(window).scroll();
+        });
+
+        if(field.OperatorType=='N')
+            condition.find('.right').keyup(function () {
+                this.value = this.value.replace(/[^0-9\.]/g,'');
+            });
+
+    }
+
+
+    /*$('#savedSearches').on('click','.remove-search',function (e) {
 
           var search=$(this).parent().data('search');
 
@@ -1166,9 +1068,9 @@ $(document).ready(function() {
          loadSavedGroup($('#container'),search.searchData.conditions);
 
 
-    });
+    });*/
 
-    loadSavedSearches();
+    /*loadSavedSearches();
     //Load the saved searches from localstorage
     function  loadSavedSearches() {
         var searches=JSON.parse(localStorage.getItem('searches'));
@@ -1241,174 +1143,67 @@ $(document).ready(function() {
         });
 
     }
-    
-    //Populate the fields
-    function populateFields() {
-
-            var groups=myGroups.Groups;
-
-            var i=0;
-           $.each(groups,function (i,group) {
-               var id='collapse'+(++i);
-               var groupPenel=$("<div class='panel panel-default field-group-container'><div class='panel-heading btn btn-default field-group-heading' data-toggle='collapse'" +
-                   " data-parent='#fields' href='#"+id+"'>"+group.Group+"</div></div>");
-
-            var btnTable=$("<table class='table table-hover panel-collapse collapse' id='"+id+"'><tbody></tbody></table>");
-
-
-            $.each(group.Fields,function (i,field) {
-                var fieldTd=$("<td class='row'><div  value='"+field.id+"' data-OperatorType='"+field.OperatorType+"' " +
-                    "class='field fieldOnly col-sm-10'>"+field.Variable+"</div><div class='col-sm-2'>" +
-                    "<button class='btn btn-default btn-add btn-sm' type='button'><span class='glyphicon glyphicon-plus'></span></button></div></td>");
-                var fieldTr=$("<tr></tr>");
-                fieldData.push(field);
-                fieldTr.append(fieldTd);
-                fieldTd.data("field",field);
-                btnTable.append(fieldTr);
-
-            });
-
-            groupPenel.append(btnTable);
-            $('#fields').append(groupPenel);
-           })
-
-    }
-    populateFields();
 
 
 
-    //Form the query condition
-    function getCondition(field) {
-        var operator;
-        var rightOperand;
-        var condition = $("<div class='condition row condition-container as-row'><div class='field col-sm-3 field-container' value='" + field.id + "'>" + field.Variable + "</div></div>");
-
-
-        //operator dropdown
-        if (field.SelectType != "Check box")
-        {
-        operator = getOperator(field.OperatorType);
-        condition.append(operator);
-
-
-        rightOperand = getRightOperand(field);
-        operator.after(rightOperand);
-        }
-        //condition.append(rightOperand);
-        condition.append(removeBtn);
-        return condition;
-    };
-
-    function getRightOperand(field) {
-        var rightOperand;
-        var selectType=field.SelectType;
-        var valueContainer= $("<div class='col-sm-5 value-container'></div>");
-        if (field.id == '21') {
-            rightOperand = getVDDL(makes, 'make');
-
-        } else if (field.id == '22') {
-            var groupedModels=getGroupedModelsFromCurrMakes();
-            rightOperand = getVDDL(groupedModels, 'model');
-        } else if(selectType=='MultiSelect'||selectType=='Dropdown'){
-            rightOperand=getDDL(field);
-
-        }else if(selectType== "Textbox"||selectType=="Range")
-        {
-            rightOperand = $("<input type='text' style='width:100px; float:left' class='right form-control right-textbox'></input>");
-        }
-        valueContainer.append(rightOperand);
-        return valueContainer;
+    function updateQuery() {
+        var condition = $('#container');
+        var query = getConditionStringsFromGroup(condition);
+        $('#query').text(query);
     }
 
-    function getOperator(operatorType) {
-        var operatorDDL;
-        var operatorGroup=_.find(operatorPool,function (o) {
-            return o.OperatorCate==operatorType;
+    function getConditionStringsFromGroup(condition) {
+        var query = '';
+        condition.children('div').each(function() {
+
+            var current = $(this);
+
+            var isGroup = current.hasClass('group');
+            var temp = '';
+            if (current.hasClass('andor')){
+                //find the andor select
+                var andorselect = current.find('.andorSelect');
+                temp = andorselect.find('option:selected').text();
+            } else if (!isGroup && current.hasClass('condition')) //straight single condition
+            {
+                temp = getSingleConditionString(current);
+            } else if (isGroup) //group recurse
+            {
+                temp = '(' + getConditionStringsFromGroup(current) + ')';
+            }
+            query = query + '  ' + temp;
+
         });
 
-            operatorDDL = $("<select class='form-control operator'></select>");
-            var operatorOptions = [];
-            var ddlDiv = $('<div class="col-sm-2 operator-container"></div>');
-            $.each(operatorGroup.Operators, function(i, operator) {
-                operatorOptions.push('<option>' + operator + '</option>');
-            });
-            operatorDDL.append(operatorOptions.join(''));
-
-            ddlDiv.append(operatorDDL);
-            return ddlDiv;
+        return query;
     }
 
-    //get dropdownlist for make and model.
-    function getVDDL(items, className) {
 
-        var DDL = $("<select class='right' data-placeholder='Select values' multiple></select>");
-
-
-
-        //If it's model ddl form the grouped ddl
-        if(className=='model'){
-            $.each(items,function (i,item) {
-                var optgroup=$("<optgroup label='"+i+"'></optgroup>");
-                var options=[];
-                $.each(item,function (i,subitem) {
-                    options.push("<option class=" + className + " value="+subitem.Id+">" + subitem.Name + "</option>");
-                });
-                optgroup.append(options.join(''));
-                DDL.append(optgroup);
-            });
-        }
-        else if(className=='make')
-        {
-            DDL.addClass('makeSelect');
-            var options = [];
-            $.each(items, function(i, item) {
-                options.push("<option class=" + className + " value="+item.Id+">" + item.Name + "</option>");
-            });
-
-            DDL.append(options.join(''));
-        }
-        return DDL;
-    }
-    //get ddl in general
-    function  getDDL(field) {
-       if(field.SelectType=='MultiSelect')
-       {
-           var DDL = $("<select class='right' data-placeholder='Select values' multiple></select>");
-       }
-       else
-       {
-           var DDL = $("<select class='right'></select>");
-       }
-
-        var options=[];
-        $.each(field.Values,function (i,v) {
-            if(i==0)
-            {
-                options.push("<option  value="+v.Value+" selected>" + v.ValueText + "</option>");
-            }
-            else
-            {
-                options.push("<option  value="+v.Value+">" + v.ValueText + "</option>");
+    function getSqlQueryFromJson(data) {
+        var query='';
+        var conditions=data;
+        $.each(conditions,function (i,condition) {
+            var temp='';
+            switch(condition.type){
+                case "condition":
+                    temp=getSingleConditionJson(condition);
+                    break;
+                case "operator":
+                    temp=condition.value;
+                    break;
+                case "group":
+                    temp= '(' + getSqlQueryFromJson(condition.conditions)+ ')';
+                    break;
             }
 
+            query=query+' '+temp;
         });
-        DDL.append(options.join(''));
 
-        return DDL;
+        return query;
     }
-    //Check if previous item exists and is not andor, then add andorOption
-    function addAndOrOptions(condition) {
-        var andOrOptions = "<div class='andor row as-row'><select class=andorSelect><option class=and>AND</option><option class=or>OR</option><select></div>";
 
-        var prevCondition = condition.prev();
-        if (prevCondition.length) {
-            var prevConditionClass = prevCondition.attr('class');
-            //if previous element is a condition add operator.
-            if (prevConditionClass.indexOf('condition') >= 0) {
-                prevCondition.after(andOrOptions);
-            }
-        }
-    }
+
+
 
     //get the condition string from condition div
     function getSingleConditionString(condition) {
@@ -1468,55 +1263,10 @@ $(document).ready(function() {
         return fieldTxt +' '+ operatorTxt +' '+ rightTxt;
     }
 
-    //Form the json object for single condition
-    function getSingleConditionData(condition) {
-        var fieldTxt = condition.find('.field').attr('value');
-        var operatorTxt = "";
-        var operator = condition.find('.operator');
-        var right = condition.find('.right');
-        var rightTxt = "";
-        var data={};
 
-        operatorTxt = operator.find('option:selected').text();
-
-
-        var selected=right.find('option:selected');
-        if(selected.length>1)//mutiSelect
-        {
-            var rigthtTxtArray=[];
-            $.each(selected,function (i,s) {
-                rigthtTxtArray.push($(s).attr('value'));
-            });
-            rightTxt='('+rigthtTxtArray.join(',')+')';
-            if(operatorTxt=='=')
-            {
-                operatorTxt='IN';
-            }
-            else
-            {
-                operatorTxt='NOT IN';
-            }
-
-        }
-        else if(selected.length==1)
-        {
-            rightTxt = right.find('option:selected').attr('value');
-        }else
-        {
-            rightTxt=right.val();
-        }
-
-
-        data.type='condition';
-        data.id=fieldTxt;
-        data.relation=operatorTxt;
-        data.value=rightTxt;
-        data.variable=condition.find('.field').text();
-        return data;
-    }
 
      function getSingleConditionJson(condition ) {
          return condition.id+' '+condition.relation+' '+condition.value;
      }
-
+*/
 });

@@ -16,8 +16,13 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js"></script>
 
 
+    <script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.15.0/jquery.validate.min.js"></script>
+
     <script src="underscore-min.js"></script>
 
+
+    <script src="populateFields.js"></script>
+    <script src="buildCondition.js"></script>
     <link rel="stylesheet" href="style.css" />
     <script src="script.js"></script>
 
@@ -27,6 +32,7 @@
 <body>
 <div class="container">
 <h2>Advanced Search</h2>
+    <form method="post">
     <div class="row">
 
         <div class="col-sm-4">
@@ -40,7 +46,7 @@
         <div class="col-sm-8" >
             <div class="pull-right btn-group fixed">
                 <button id="addGroup" class="btn btn-primary">Add Group</button>
-                <button id="getJson" class="btn btn-primary">Generate SQL Query</button>
+                <button id="getJson" type="submit" class="btn btn-primary" name="submit">Generate SQL Query</button>
                 <button id="removeAll" class="btn btn-primary">Remove All</button>
             </div>
             <div class="title">
@@ -97,7 +103,7 @@
     </div><!-- /.modal -->
 
 
-    <div class="modal fade" tabindex="-1" role="dialog" id="queryModal">
+    <div class="modal fade" tabindex="-1" role="dialog" id="groupErrorMsg">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -105,16 +111,14 @@
 
                 </div>
                 <div class="modal-body">
-                  <div>
-                      <ul id="erroMsg">
-
-                      </ul>
+                  <div class="text-danger">
+                      Groups should not be empty.
                   </div>
                 </div>
             </div><!-- /.modal-content -->
         </div><!-- /.modal-dialog -->
     </div><!-- /.modal -->
 </div>
-
+</form>
 </body>
 </html>
